@@ -29,7 +29,7 @@ jobs:
     steps:
       - checkout
       - flutter/install_sdk_and_pub:
-          version: 3.19.0
+          version: "3.16.0"
       - run:
           name: Setup Android SDK 35
           command: |
@@ -71,47 +71,7 @@ jobs:
           path: android/app/key.jks
           destination: keystore.jks
 
-  build_ios:
-    macos:
-      xcode: 15.0.0
-    resource_class: macos.m1.medium.gen1
-    steps:
-      - checkout
-      - flutter/install_sdk_and_pub:
-          version: "3.16.0"
-      - run:
-          name: Setup iOS certificates
-          command: |
-            if [ -n "$IOS_CERTIFICATE" ]; then
-              echo $IOS_CERTIFICATE | base64 --decode > ios_certificate.p12
-              echo $IOS_PROVISIONING_PROFILE | base64 --decode > ios_profile.mobileprovision
-              
-              # Install certificate
-              security create-keychain -p "" build.keychain
-              security import ios_certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -A
-              security list-keychains -s build.keychain
-              security default-keychain -s build.keychain
-              security unlock-keychain -p "" build.keychain
-              
-              # Install provisioning profile
-              mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-              cp ios_profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-            fi
-      - run:
-          name: Build iOS IPA
-          command: |
-            if [ -n "$IOS_CERTIFICATE" ]; then
-              flutter build ipa --release
-            else
-              echo "iOS certificates not provided, skipping iOS build"
-            fi
-      - store_artifacts:
-          path: build/ios/ipa/
-          destination: ios-app
-
 workflows:
   build_and_deploy:
     jobs:
-      - build_android
-      - build_ios
       - build_android
