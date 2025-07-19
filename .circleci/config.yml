@@ -25,7 +25,6 @@ jobs:
   build_android:
     executor:
       name: android/android-machine
-      resource-class: large
       tag: 2023.07.1
     steps:
       - checkout
