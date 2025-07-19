@@ -25,7 +25,7 @@ jobs:
   build_android:
     executor:
       name: android/android-machine
-      tag: 2023.07.1
+      tag: 2023.06
     steps:
       - checkout
       - flutter/install_sdk_and_pub:
